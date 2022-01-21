@@ -1,6 +1,6 @@
 [package]
 name = "passgen"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Sparkenstein <zetabytes.pp@gmail.com>"]
 edition = "2018"
 
@@ -8,4 +8,4 @@ edition = "2018"
 
 [dependencies]
 rand = "0.7.3"
-clap = "2.33.3"
+clap = { version = "3.0.10", features = ["derive"] }

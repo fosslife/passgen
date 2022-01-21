@@ -1,53 +1,52 @@
-extern crate clap;
-
-use clap::{App, Arg};
+use clap::Parser;
 use rand::{thread_rng, Rng};
+
+#[derive(Parser)]
+#[clap(
+    about = "Generate Random password on command line",
+    version = "1.1",
+    author = "@Sparkenstein"
+)]
+struct Args {
+    #[clap(short, long, help = "Include Uppercase letters")]
+    pub upper: bool,
+
+    #[clap(short, long, help = "Include Lowercase letters")]
+    pub lower: bool,
+
+    #[clap(short, long, help = "Include Numbers")]
+    pub nums: bool,
+
+    #[clap(short, long, help = "Include Symbols")]
+    pub symbols: bool,
+
+    #[clap(short = 'L', long, help = "Include Symbols")]
+    pub length: usize,
+}
 
 fn main() {
     let mut rng = thread_rng();
-    let matches = App::new("passgen")
-        .version("1.0")
-        .author("@Sparkenstein")
-        .about("Generate Random password on command line")
-        .arg(
-            Arg::with_name("include")
-                .long("include")
-                .short("i")
-                .default_value("nlus")
-                .help("include numbers/upppercase/lowercase/symbols in generated string"),
-        )
-        .arg(
-            Arg::with_name("length")
-                .long("length")
-                .short("l")
-                .takes_value(true)
-                .default_value("16")
-                .help("include lowercase characters in generated string"),
-        )
-        .get_matches();
-    let chars_to_include = matches.value_of("include").unwrap();
+
+    let m = Args::parse();
+
     let mut pass_string = String::from("");
-    if chars_to_include.contains("l") {
+    if m.lower {
         pass_string += "abcdefghijklmnopqrstuvwxyz";
     }
 
-    if chars_to_include.contains("n") {
+    if m.nums {
         pass_string += "0123456789";
     }
 
-    if chars_to_include.contains("s") {
+    if m.symbols {
         pass_string += ")(*&^%$#@!~";
     }
 
-    if chars_to_include.contains("u") {
+    if m.upper {
         pass_string += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     }
 
-    let length = matches
-        .value_of("length")
-        .unwrap()
-        .parse::<usize>()
-        .unwrap();
+    let length = m.length;
     let password = (0..length)
         .map(|_| {
             let idx = rng.gen_range(0, pass_string.len());
