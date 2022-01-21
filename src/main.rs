@@ -22,6 +22,9 @@ struct Args {
 
     #[clap(short = 'L', long, help = "Include Symbols")]
     pub length: usize,
+
+    #[clap(short, long, help = "Calculate entropy")]
+    pub entropy: bool,
 }
 
 fn main() {
@@ -54,4 +57,24 @@ fn main() {
         })
         .collect::<String>();
     println!("{}", password);
+
+    if m.entropy {
+        let e = calculate_entropy(length, pass_string.len());
+        // ref: https://iocane.com.au/talking-passwords-and-entropy/
+        let quality = match e.round() as usize {
+            d if d < 28 => "Very Weak",
+            28..=35 => "Weak",
+            36..=59 => "Reasonable",
+            60..=127 => "Strong",
+            d if d > 128 => "Very Strong",
+            _ => "Unknown entropy detected, this should never happen",
+        };
+        println!("Entropy: {:.3}bits [{}]", e, quality);
+    }
+}
+
+pub fn calculate_entropy(l: usize, c: usize) -> f64 {
+    let chars = c as f64;
+    let pow = chars.powf(l as f64);
+    return pow.log2();
 }
